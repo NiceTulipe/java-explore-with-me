@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dao.HitRepository;
+import ru.practicum.exeption.StartEndRangeException;
 import ru.practicum.mapper.HitMapper;
 import ru.practicum.mapper.ViewStatMapper;
 import ru.practicum.model.EndpointHit;
@@ -34,23 +35,33 @@ public class HitServiceImpl implements HitService {
         checkDate(start, end);
         if (uris == null) {
             if (unique) {
-                return hitRepository.getStatisticsWithUniqueIp(start, end).stream()
+                return hitRepository.getViewStatsWithoutUriUniqIp(start, end).stream()
                         .map(ViewStatMapper::toViewStatsDto)
                         .collect(Collectors.toList());
             } else {
-                return hitRepository.getAllStatistics(start, end).stream()
+                return hitRepository.getViewStatsWithoutUri(start, end).stream()
                         .map(ViewStatMapper::toViewStatsDto)
                         .collect(Collectors.toList());
             }
         } else {
             if (unique) {
-                return hitRepository.getStatisticsWithUniqueIpAndUris(start, end, uris).stream()
+                return hitRepository.getViewStatsWithUniqIp(uris, start, end).stream()
                         .map(ViewStatMapper::toViewStatsDto)
                         .collect(Collectors.toList());
             } else {
-                return hitRepository.getAllStatisticsWithUris(start, end, uris).stream()
+                return hitRepository.getViewStatsAll(uris, start, end).stream()
                         .map(ViewStatMapper::toViewStatsDto)
                         .collect(Collectors.toList());
+            }
+        }
+    }
+
+        private void checkDate (LocalDateTime startTime, LocalDateTime endTime){
+            if (startTime == null || endTime == null) {
+                throw new StartEndRangeException("Ошибка времени начала и конца диапазона");
+            }
+            if (startTime.isAfter(endTime)) {
+                throw new StartEndRangeException("Ошибка времени начала и конца диапазона");
             }
         }
     }

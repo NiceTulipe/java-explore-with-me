@@ -40,4 +40,13 @@ public interface HitRepository extends JpaRepository<EndpointHit, Long> {
     List<ViewStats> getViewStatsWithoutUri(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end);
+
+    @Query("SELECT new ViewStats(EH.uri, EH.app, COUNT(DISTINCT EH.ip))" +
+            "FROM EndpointHit AS EH " +
+            "WHERE EH.timestamp BETWEEN :start AND :end " +
+            "GROUP BY EH.app, EH.uri " +
+            "ORDER BY COUNT (EH.ip) DESC ")
+    List<ViewStats> getViewStatsWithoutUriUniqIp(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
 }

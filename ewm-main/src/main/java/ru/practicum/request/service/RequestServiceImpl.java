@@ -8,7 +8,7 @@ import ru.practicum.event.repository.EventsRepository;
 import ru.practicum.exception.BadRequestException;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
-import ru.practicum.model.State;
+import ru.practicum.enumies.State;
 import ru.practicum.request.dto.ParticipationRequestDto;
 import ru.practicum.request.model.Request;
 import ru.practicum.request.mapper.RequestMapper;
