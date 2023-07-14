@@ -1,9 +1,9 @@
-package ru.practicum.mapper;
+package ru.practicum.stats.mapper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.practicum.dto.HitDTO;
-import ru.practicum.model.EndpointHit;
+import ru.practicum.stats.model.EndpointHit;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

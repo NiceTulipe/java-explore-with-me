@@ -1,4 +1,4 @@
-package ru.practicum.enumies;
+package ru.practicum.modelstate;
 
 public enum State {
     PENDING, PUBLISHED, CANCELED, CONFIRMED, REJECTED

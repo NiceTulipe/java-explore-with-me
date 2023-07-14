@@ -1,15 +1,13 @@
-package ru.practicum.model;
+package ru.practicum.stats.model;
 
 import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-@Entity
 @Getter
-@Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class ViewStats {
     @Id
     private String app;

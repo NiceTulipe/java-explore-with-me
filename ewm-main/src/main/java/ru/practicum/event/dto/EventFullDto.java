@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.category.dto.NewCategoryDto;
 import ru.practicum.location.Location;
-import ru.practicum.enumies.State;
+import ru.practicum.modelstate.State;
 import ru.practicum.user.dto.UserShortDto;
 
 import java.time.LocalDateTime;

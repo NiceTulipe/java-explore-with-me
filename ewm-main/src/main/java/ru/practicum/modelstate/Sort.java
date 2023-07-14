@@ -1,4 +1,4 @@
-package ru.practicum.enumies;
+package ru.practicum.modelstate;
 
 public enum Sort {
     EVENT_DATE, VIEWS

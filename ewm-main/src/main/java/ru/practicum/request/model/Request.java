@@ -1,7 +1,7 @@
 package ru.practicum.request.model;
 
 import lombok.*;
-import ru.practicum.enumies.State;
+import ru.practicum.modelstate.State;
 import ru.practicum.user.model.User;
 
 import javax.persistence.*;

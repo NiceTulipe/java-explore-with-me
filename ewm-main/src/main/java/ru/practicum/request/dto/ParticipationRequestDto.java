@@ -2,7 +2,7 @@ package ru.practicum.request.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import ru.practicum.enumies.State;
+import ru.practicum.modelstate.State;
 
 @Getter
 @Builder

@@ -1,10 +1,7 @@
-package ru.practicum.mapper;
+package ru.practicum.stats.mapper;
 
 import ru.practicum.dto.ViewStatDTO;
-import ru.practicum.model.ViewStats;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import ru.practicum.stats.model.ViewStats;
 
 public class ViewStatMapper {
     public static ViewStatDTO toViewStatsDto(ViewStats viewStats) {
