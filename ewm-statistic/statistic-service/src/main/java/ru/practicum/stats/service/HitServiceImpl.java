@@ -33,21 +33,21 @@ public class HitServiceImpl implements HitService {
             checkDate(start, end);
             if (uris == null) {
                 if (unique) {
-                    return repository.getStatisticsWithUniqueIp(start, end).stream()
+                    return repository.getViewStatsWithoutUriUniqIp(start, end).stream()
                             .map(ViewStatMapper::toViewStatsDto)
                             .collect(Collectors.toList());
                 } else {
-                    return repository.getAllStatistics(start, end).stream()
+                    return repository.getViewStatsWithoutUri(start, end).stream()
                             .map(ViewStatMapper::toViewStatsDto)
                             .collect(Collectors.toList());
                 }
             } else {
                 if (unique) {
-                    return repository.getStatisticsWithUniqueIpAndUris(start, end, uris).stream()
+                    return repository.getViewStatsWithUniqIp(start, end, uris).stream()
                             .map(ViewStatMapper::toViewStatsDto)
                             .collect(Collectors.toList());
                 } else {
-                    return repository.getAllStatisticsWithUris(start, end, uris).stream()
+                    return repository.getViewStatsAll(start, end, uris).stream()
                             .map(ViewStatMapper::toViewStatsDto)
                             .collect(Collectors.toList());
                 }

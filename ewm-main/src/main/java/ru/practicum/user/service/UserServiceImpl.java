@@ -24,25 +24,19 @@ import static ru.practicum.user.mapper.UserMapper.toUserDto;
 public class UserServiceImpl implements UserService {
     private final UserRepository repository;
 
-    /**
-     * Добавление нового пользователя
-     */
     @Transactional
     public NewUserDto createUser(NewUserDto newUserDto) {
         User user = toUser(newUserDto);
         try {
             return toUserDto(repository.save(user));
         } catch (DataIntegrityViolationException e) {
-            throw new ConflictException("Почта " + newUserDto.getEmail() + " или имя пользователя " +
-                    newUserDto.getName() + " уже используется");
+            throw new ConflictException("Email " + newUserDto.getEmail() + " or Name " +
+                    newUserDto.getName() + " already in use");
         } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Запрос на добавление пользователя" + newUserDto + " составлен не корректно ");
+            throw new BadRequestException("Request for add new user " + newUserDto + " incorrect ");
         }
     }
 
-    /**
-     * Получение информации о пользователях
-     */
     public List<NewUserDto> getUsers(List<Long> ids, Integer from, Integer size) {
         PageRequest page = PageRequest.of(from, size);
         if (ids == null) {
@@ -56,9 +50,6 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    /**
-     * Удаление пользователя
-     */
     @Transactional
     public void deleteUser(Long id) {
         repository.deleteById(id);

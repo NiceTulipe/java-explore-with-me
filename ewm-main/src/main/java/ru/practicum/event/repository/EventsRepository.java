@@ -18,7 +18,7 @@ public interface EventsRepository extends JpaRepository<Event, Long> {
 
     List<Event> findByCategory(Category category);
 
-    @Query("select e from Event e " +
+    @Query("select e from Event as e " +
             "where (:users is null or e.initiator.id in :users) " +
             "and (:states is null or e.state in :states) " +
             "and (:categories is null or e.category.id in :categories) " +
@@ -31,7 +31,7 @@ public interface EventsRepository extends JpaRepository<Event, Long> {
                                                            @Param("rangeEnd") LocalDateTime rangeEnd,
                                                            Pageable pageable);
 
-    @Query("select e from Event e " +
+    @Query("select e from Event as e " +
             "where ((:text is null or upper(e.annotation) like upper(concat('%', :text, '%'))) " +
             "or (:text is null or upper(e.description) like upper(concat('%', :text, '%')))) " +
             "and (:state is null or e.state = :state) " +
@@ -49,7 +49,7 @@ public interface EventsRepository extends JpaRepository<Event, Long> {
                                                         @Param("rangeEnd") LocalDateTime rangeEnd,
                                                         Pageable pageable);
 
-    @Query("select e from Event e " +
+    @Query("select e from Event as e " +
             "where ((:text is null or upper(e.annotation) like upper(concat('%', :text, '%'))) " +
             "or (:text is null or upper(e.description) like upper(concat('%', :text, '%')))) " +
             "and (:state is null or e.state = :state) " +
@@ -66,7 +66,7 @@ public interface EventsRepository extends JpaRepository<Event, Long> {
                                               @Param("rangeEnd") LocalDateTime rangeEnd,
                                               Pageable pageable);
 
-    @Query("select e from Event e " +
+    @Query("select e from Event as e " +
             "where ((:text is null or upper(e.annotation) like upper(concat('%', :text, '%'))) " +
             "or (:text is null or upper(e.description) like upper(concat('%', :text, '%')))) " +
             "and (:state is null or e.state = :state) " +
@@ -83,7 +83,7 @@ public interface EventsRepository extends JpaRepository<Event, Long> {
                                                   @Param("rangeEnd") LocalDateTime rangeEnd,
                                                   Pageable pageable);
 
-    @Query("select e from Event e " +
+    @Query("select e from Event as e " +
             "where ((:text is null or upper(e.annotation) like upper(concat('%', :text, '%'))) " +
             "or (:text is null or upper(e.description) like upper(concat('%', :text, '%')))) " +
             "and (:state is null or e.state = :state) " +

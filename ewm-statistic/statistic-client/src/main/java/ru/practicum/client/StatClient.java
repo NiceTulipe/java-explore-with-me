@@ -17,7 +17,6 @@ import java.util.Map;
 
 @Service
 public class StatClient extends BaseClient {
-    //private static final String API_PREFIX = "/hit";
 
     @Autowired
     public StatClient(@Value("${statistic-server.url}") String serverUrl, RestTemplateBuilder builder) {

@@ -15,42 +15,42 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleIdNotFoundException(NotFoundException exception) {
-        log.debug("Получен статус 404 Not found {}", exception.getMessage(), exception);
+        log.debug("404 Not found {}", exception.getMessage(), exception);
         return new ErrorResponse(exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleInvalidDateTimeException(InvalidDateTimeException exception) {
-        log.debug("Получен статус 400 CONFLICT {}", exception.getMessage(), exception);
+        log.debug("400 CONFLICT {}", exception.getMessage(), exception);
         return new ErrorResponse(exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleViolationException(DataIntegrityViolationException exception) {
-        log.debug("Получен статус 409 CONFLICT {}", exception.getMessage(), exception);
+        log.debug("409 CONFLICT {}", exception.getMessage(), exception);
         return new ErrorResponse(exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleIncorrectStateException(IncorrectStateException exception) {
-        log.debug("Получен статус 409 CONFLICT {}", exception.getMessage(), exception);
+        log.debug("409 CONFLICT {}", exception.getMessage(), exception);
         return new ErrorResponse(exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleConflictException(ConflictException exception) {
-        log.debug("Получен статус 409 CONFLICT {}", exception.getMessage(), exception);
+        log.debug("409 CONFLICT {}", exception.getMessage(), exception);
         return new ErrorResponse(exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleBadRequestException(BadRequestException exception) {
-        log.debug("Получен статус 400 BAD_REQUEST {}", exception.getMessage(), exception);
+        log.debug("400 BAD_REQUEST {}", exception.getMessage(), exception);
         return new ErrorResponse(exception.getMessage());
     }
 

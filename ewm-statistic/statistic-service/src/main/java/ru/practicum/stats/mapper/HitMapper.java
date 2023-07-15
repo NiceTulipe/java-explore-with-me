@@ -1,6 +1,5 @@
 package ru.practicum.stats.mapper;
 
-import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.practicum.dto.HitDTO;
 import ru.practicum.stats.model.EndpointHit;
@@ -8,7 +7,7 @@ import ru.practicum.stats.model.EndpointHit;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class HitMapper {
 
     public static final String pattern = "yyyy-MM-dd HH:mm:ss";

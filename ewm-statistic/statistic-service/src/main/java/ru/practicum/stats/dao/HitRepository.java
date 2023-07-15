@@ -10,24 +10,24 @@ import java.util.List;
 
 public interface HitRepository extends JpaRepository<EndpointHit, Long> {
 
-    @Query( "select new ru.practicum.stats.model.ViewStats(app, uri, count(distinct ip) as hits) from EndpointHit " +
+    @Query( "select new ru.practicum.stats.model.ViewStats(app, uri, count(distinct ip)) from EndpointHit " +
             "where timestamp between ?1 and ?2 and uri in(?3) " +
-            "group by app, uri order by hits desc" )
-    List<ViewStats> getStatisticsWithUniqueIpAndUris(LocalDateTime start, LocalDateTime end, List<String> uri);
+            "group by app, uri " +
+            "ORDER BY count(distinct ip) DESC" )
+    List<ViewStats> getViewStatsWithUniqIp(LocalDateTime start, LocalDateTime end, List<String> uri);
 
-    @Query(" select new ru.practicum.stats.model.ViewStats(app, uri, count(ip) as hits) from EndpointHit " +
+    @Query(" select new ru.practicum.stats.model.ViewStats(app, uri, count(ip)) from EndpointHit " +
             "where timestamp between ?1 and ?2 and uri in(?3) " +
-            "group by app, uri order by hits desc")
-    List<ViewStats> getAllStatisticsWithUris(LocalDateTime start, LocalDateTime end, List<String> uri);
+            "group by app, uri order by count(ip) desc")
+    List<ViewStats> getViewStatsAll(LocalDateTime start, LocalDateTime end, List<String> uri);
 
-    @Query(" select new ru.practicum.stats.model.ViewStats(app, uri, count(distinct ip) as hits) from EndpointHit " +
+    @Query(" select new ru.practicum.stats.model.ViewStats(app, uri, count(distinct ip) ) from EndpointHit " +
             "where timestamp between ?1 and ?2 " +
-            "group by app, uri order by hits desc")
-    List<ViewStats> getStatisticsWithUniqueIp(LocalDateTime start, LocalDateTime end);
+            "group by app, uri order by count(distinct ip) desc")
+    List<ViewStats> getViewStatsWithoutUriUniqIp(LocalDateTime start, LocalDateTime end);
 
-    @Query(" select new ru.practicum.stats.model.ViewStats(app, uri, count(ip) as hits) from EndpointHit " +
+    @Query(" select new ru.practicum.stats.model.ViewStats(app, uri, count(ip) ) from EndpointHit " +
             "where timestamp between ?1 and ?2 " +
-            "group by app, uri order by hits desc")
-    List<ViewStats> getAllStatistics(LocalDateTime start, LocalDateTime end);
-
+            "group by app, uri order by count(ip) desc")
+    List<ViewStats> getViewStatsWithoutUri(LocalDateTime start, LocalDateTime end);
 }

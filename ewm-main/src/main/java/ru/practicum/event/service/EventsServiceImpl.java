@@ -58,9 +58,6 @@ public class EventsServiceImpl implements EventsService {
     private final RequestRepository requestRepository;
     private final StatClient statisticClient;
 
-    /**
-     * Добавление нового события
-     */
     @Transactional
     public EventFullDto createEvent(Long userId, NewEventDto dto) {
         if (dto.getPaid() == null) {
@@ -75,17 +72,13 @@ public class EventsServiceImpl implements EventsService {
         LocalDateTime nowDateTime = LocalDateTime.now();
         checkDateTimeForDto(nowDateTime, dto.getEventDate());
         Category category = categoryRepository.findById(dto.getCategory())
-                .orElseThrow(() -> new NotFoundException("Категория с таким id  не найдена"));
+                .orElseThrow(() -> new NotFoundException("Category with id not found"));
         User user = getUserModel(userId);
         locationRepository.save(dto.getLocation());
         Event event = toEvent(dto, category, user, nowDateTime);
         return toEventFullDto(eventRepository.save(event), 0L);
     }
 
-
-    /**
-     * Получение событий добавленных пользователем
-     */
     public List<EventsShortDto> getEventsFromUser(Long userId, Integer from, Integer size) {
         PageRequest page = PageRequest.of(from, size);
         User user = getUserModel(userId);
@@ -97,9 +90,6 @@ public class EventsServiceImpl implements EventsService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Получение полной информации о событии добавленном пользователем
-     */
     public EventFullDto getEventWithOwner(Long userId, Long eventId) {
         checkUser(userId);
         Event event = findEventById(eventId);
@@ -109,9 +99,6 @@ public class EventsServiceImpl implements EventsService {
         return eventFullDto;
     }
 
-    /**
-     * Изменение события добавленном пользователем
-     */
     @Transactional
     public EventFullDto updateEvent(Long userId, Long eventId, UpdateEvent dto) {
         Event event = findEventById(eventId);
@@ -120,8 +107,7 @@ public class EventsServiceImpl implements EventsService {
             checkDateTimeForDto(LocalDateTime.now(), dto.getEventDate());
         }
         if (!(event.getState().equals(State.CANCELED) || event.getState().equals(State.PENDING))) {
-            throw new IncorrectStateException("Некорректный статус. Изменить можно только отмененные " +
-                    "события или события в состоянии ожидания модерации.");
+            throw new IncorrectStateException("Incorrect status, cannot be updated.");
         }
         if (dto.getStateAction() != null) {
             switch (dto.getStateAction()) {
@@ -132,17 +118,19 @@ public class EventsServiceImpl implements EventsService {
                     event.setState(State.CANCELED);
                     break;
                 default:
-                    throw new IncorrectStateException("Некорректный статус dto.");
+                    throw new IncorrectStateException("Incorrect status dto.");
             }
         }
         return getEventFullDto(dto, event);
     }
 
-    /**
-     * Поиск событий с фильтрами для администратора
-     */
-    public List<EventFullDto> getEventsForAdmin(List<Long> users, List<String> states, List<Long> categories,
-                                                LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size) {
+    public List<EventFullDto> getEventsForAdmin(List<Long> users,
+                                                List<String> states,
+                                                List<Long> categories,
+                                                LocalDateTime rangeStart,
+                                                LocalDateTime rangeEnd,
+                                                Integer from,
+                                                Integer size) {
         PageRequest page = PageRequest.of(from, size);
         List<State> stateList = null;
         LocalDateTime start = null;
@@ -166,31 +154,28 @@ public class EventsServiceImpl implements EventsService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Редактирование данных события и его статуса (отклонение/публикация) администратором
-     */
     @Transactional
     public EventFullDto updateEventByAdmin(Long eventId, UpdateEvent dto) {
         Event event = findEventById(eventId);
         if (dto.getEventDate() != null) {
             if (LocalDateTime.now().plusHours(1).isAfter(dto.getEventDate())) {
-                throw new BadRequestException("Ошибка. Дата и время на которые намечено событие " +
-                        "не может быть раньше, чем через час от текущего момента");
+                throw new BadRequestException("Cannot be updated, the date for event " +
+                        "must be 1 hour later from the current moment");
             }
         } else {
             if (dto.getStateAction() != null) {
                 if (dto.getStateAction().equals(StateAction.PUBLISH_EVENT) &&
                         LocalDateTime.now().plusHours(1).isAfter(event.getEventDate())) {
-                    throw new IncorrectStateException("Ошибка. Дата и время публикуемого события " +
-                            "не может быть раньше, чем через час от текущего момента");
+                    throw new IncorrectStateException("Cannot be updated, the date for published event " +
+                            "must be 1 hour later from the current moment");
                 }
                 if (dto.getStateAction().equals(StateAction.PUBLISH_EVENT) && !(event.getState().equals(State.PENDING))) {
-                    throw new IncorrectStateException("Некорректный статус. Событие можно публиковать, " +
-                            "только если оно в состоянии ожидания публикации.");
+                    throw new IncorrectStateException("Incorrect status. An event can be published only " +
+                            "if state = waiting for publication");
                 }
                 if (dto.getStateAction().equals(StateAction.REJECT_EVENT) && event.getState().equals(State.PUBLISHED)) {
-                    throw new IncorrectStateException("Некорректный статус. Событие можно отклонить, " +
-                            "только если оно еще не опубликовано.");
+                    throw new IncorrectStateException("Incorrect status. An event can be rejected only " +
+                            "if event not published");
                 }
             }
         }
@@ -204,18 +189,22 @@ public class EventsServiceImpl implements EventsService {
                     event.setPublishedOn(LocalDateTime.now());
                     break;
                 default:
-                    throw new IncorrectStateException("Некорректный статус dto.");
+                    throw new IncorrectStateException("Incorrect status dto.");
             }
         }
         return getEventFullDto(dto, event);
     }
 
-    /**
-     * Получение событий с возможностью фильтрации (публичный доступ)
-     */
-    public List<EventsShortDto> getEventsWithFilters(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
-                                                     LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from,
-                                                     Integer size, HttpServletRequest request) {
+    public List<EventsShortDto> getEventsWithFilters(String text,
+                                                     List<Long> categories,
+                                                     Boolean paid,
+                                                     LocalDateTime rangeStart,
+                                                     LocalDateTime rangeEnd,
+                                                     Boolean onlyAvailable,
+                                                     String sort,
+                                                     Integer from,
+                                                     Integer size,
+                                                     HttpServletRequest request) {
         PageRequest page = PageRequest.of(from, size);
         List<Event> events = new ArrayList<>();
         checkDateTime(rangeStart, rangeEnd);
@@ -280,13 +269,10 @@ public class EventsServiceImpl implements EventsService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Получение полной информации об опубликованном событии по его идентификатору
-     */
     public EventFullDto getEventWithFullInfoById(Long id, HttpServletRequest request) {
         Event event = findEventById(id);
         if (!event.getState().equals(State.PUBLISHED)) {
-            throw new NotFoundException("Событие еще не опубликовано");
+            throw new NotFoundException("Event not published yet");
         }
         addStatistic(request);
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event, 0L);
@@ -295,9 +281,6 @@ public class EventsServiceImpl implements EventsService {
         return eventFullDto;
     }
 
-    /**
-     * Получение информации о запросах на участие в событии текущего пользователя
-     */
     public List<ParticipationRequestDto> getRequestsForUserForThisEvent(Long userId, Long eventId) {
         checkUser(userId);
         checkEvent(eventId);
@@ -307,26 +290,25 @@ public class EventsServiceImpl implements EventsService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Изменение статуса (подтверждение/отмена) заявок на участие в событии текущего пользователя
-     */
     @Transactional
-    public EventRequestStatusUpdateResult changeRequestsStatus(Long userId, Long eventId, EventRequestStatusUpdateRequest dto) {
+    public EventRequestStatusUpdateResult changeRequestsStatus(Long userId,
+                                                               Long eventId,
+                                                               EventRequestStatusUpdateRequest dto) {
         List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
         List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
         checkUser(userId);
         Event event = findEventById(eventId);
         if (!event.getRequestModeration() || event.getParticipantLimit().equals(0L)) {
-            throw new ConflictException("Подтверждение заявок не требуется");
+            throw new ConflictException("Approved don't need");
         }
         long limitBalance = event.getParticipantLimit() - event.getConfirmedRequests();
         if (event.getParticipantLimit() != 0 && limitBalance <= 0) {
-            throw new ConflictException("У события достигнут лимит запросов на участие.");
+            throw new ConflictException("Event has reached the limit of requests");
         }
         if (dto.getStatus().equals(State.REJECTED.toString())) {
             for (Long requestId : dto.getRequestIds()) {
                 Request request = requestRepository.findById(requestId)
-                        .orElseThrow(() -> new NotFoundException("Запроса c id = " + requestId + " не найдено."));
+                        .orElseThrow(() -> new NotFoundException("request with id = " + requestId + " not found"));
                 if (request.getStatus().equals(State.PENDING)) {
                     request.setStatus(State.REJECTED);
                     rejectedRequests.add(toRequestDto(request));
@@ -337,7 +319,7 @@ public class EventsServiceImpl implements EventsService {
             if (limitBalance != 0) {
                 int finalI1 = i;
                 Request request = requestRepository.findById(dto.getRequestIds().get(i))
-                        .orElseThrow(() -> new NotFoundException("Запроса c id = " + finalI1 + " не найдено."));
+                        .orElseThrow(() -> new NotFoundException("request with id = " + finalI1 + " not found"));
                 if (request.getStatus().equals(State.PENDING)) {
                     request.setStatus(State.CONFIRMED);
                     event.setConfirmedRequests(event.getConfirmedRequests() + 1);
@@ -348,7 +330,7 @@ public class EventsServiceImpl implements EventsService {
             } else {
                 int finalI = i;
                 Request request = requestRepository.findById(dto.getRequestIds().get(i))
-                        .orElseThrow(() -> new NotFoundException("Запроса c id = " + finalI + " не найдено."));
+                        .orElseThrow(() -> new NotFoundException("request with id  = " + finalI + " not found"));
                 if (request.getStatus().equals(State.PENDING)) {
                     request.setStatus(State.REJECTED);
                     rejectedRequests.add(toRequestDto(request));
@@ -361,9 +343,6 @@ public class EventsServiceImpl implements EventsService {
                 .build();
     }
 
-    /**
-     * Добавление информации о просмотре события в сервис статистики
-     */
     private void addStatistic(HttpServletRequest request) {
         String app = "ewm-main";
         statisticClient.addStatistic(HitDTO.builder()
@@ -383,9 +362,6 @@ public class EventsServiceImpl implements EventsService {
         return eventFullDto;
     }
 
-    /**
-     * Получение информации о просмотрах из сервиса статистики
-     */
     private Map<Long, Long> getStatisticFromListEvents(List<Event> events) {
         List<Long> idEvents = events.stream()
                 .map(Event::getId)
@@ -411,19 +387,20 @@ public class EventsServiceImpl implements EventsService {
             end = LocalDateTime.now();
         }
         if (start.isAfter(end)) {
-            throw new BadRequestException("Некорректный запрос. Дата окончания события задана позже даты старта");
+            throw new BadRequestException("Incorrect request, start date > end date");
         }
     }
 
     private Event updateEventFields(Event event, UpdateEvent dto) {
         ofNullable(dto.getAnnotation()).ifPresent(event::setAnnotation);
         ofNullable(dto.getCategory()).ifPresent(category -> event.setCategory(categoryRepository.findById(category)
-                .orElseThrow(() -> new NotFoundException("Категория с таким id  не найдена"))));
+                .orElseThrow(() -> new NotFoundException("category with id not found"))));
         ofNullable(dto.getDescription()).ifPresent(event::setDescription);
         ofNullable(dto.getEventDate()).ifPresent(
                 event::setEventDate);
         if (dto.getLocation() != null) {
-            List<Location> location = locationRepository.findByLatAndLon(dto.getLocation().getLat(), dto.getLocation().getLon());
+            List<Location> location = locationRepository.findByLatAndLon(dto.getLocation().getLat(),
+                    dto.getLocation().getLon());
             if (location.isEmpty()) {
                 locationRepository.save(dto.getLocation());
             }
@@ -438,30 +415,30 @@ public class EventsServiceImpl implements EventsService {
 
     private void checkDateTimeForDto(LocalDateTime nowDateTime, LocalDateTime dtoDateTime) {
         if (nowDateTime.plusHours(2).isAfter(dtoDateTime)) {
-            throw new BadRequestException("Ошибка. Дата и время на которые намечено событие " +
-                    "не может быть раньше, чем через два часа от текущего момента");
+            throw new BadRequestException("error the date for event " +
+                    "must be 2 hour later from the current moment");
         }
     }
 
     private void checkUser(Long userId) {
         if (!userRepository.existsById(userId)) {
-            throw new NotFoundException("Пользователь не найден");
+            throw new NotFoundException("user not found");
         }
     }
 
     private User getUserModel(Long idUser) {
         return userRepository.findById(idUser)
-                .orElseThrow(() -> new NotFoundException("Пользователь с таким id  не найден"));
+                .orElseThrow(() -> new NotFoundException("user with id not found"));
     }
 
     private Event findEventById(Long eventId) {
         return eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Событие с таким id не найдено"));
+                .orElseThrow(() -> new NotFoundException("Event with id not found"));
     }
 
     private void checkEvent(Long eventId) {
         if (!eventRepository.existsById(eventId)) {
-            throw new NotFoundException("Событие не найдено");
+            throw new NotFoundException("Event not found");
         }
     }
 }

@@ -1,13 +1,12 @@
 package ru.practicum.request.mapper;
 
-import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.practicum.request.dto.ParticipationRequestDto;
 import ru.practicum.request.model.Request;
 
 import static ru.practicum.utility.UtilityClass.formatter;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class RequestMapper {
 
     public static ParticipationRequestDto toRequestDto(Request request) {

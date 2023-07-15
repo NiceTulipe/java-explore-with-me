@@ -27,17 +27,17 @@ public class AdminCompilationController {
         return service.createCompilation(dto);
     }
 
+    @PatchMapping("{compId}")
+    public CompilationDto updateCompilations(@PathVariable Long compId,
+                                             @RequestBody @Valid UpdateCompilationRequest dto) {
+        log.info("Update compilation with compId {}", compId);
+        return service.updateCompilations(compId, dto);
+    }
+
     @DeleteMapping("{compId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCompilation(@PathVariable Long compId) {
         log.info("Delete compilation {}", compId);
         service.deleteCompilation(compId);
-    }
-
-    @PatchMapping("{compId}")
-    public CompilationDto updateCompilations(@PathVariable Long compId,
-                                             @RequestBody @Valid UpdateCompilationRequest dto) {
-        log.info("Update compilation with compId {}, dto {}", compId, dto);
-        return service.updateCompilations(compId, dto);
     }
 }

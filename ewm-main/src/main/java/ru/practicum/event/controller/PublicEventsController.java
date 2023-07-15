@@ -21,6 +21,12 @@ import static ru.practicum.utility.UtilityClass.pattern;
 public class PublicEventsController {
     private final EventsService service;
 
+    @GetMapping("{id}")
+    public EventFullDto getEventWithFullInfoById(@PathVariable Long id, HttpServletRequest request) {
+        log.info("Get Event by id {}", id);
+        return service.getEventWithFullInfoById(id, request);
+    }
+
     @GetMapping
     public List<EventsShortDto> getEventsWithFilters(
             @RequestParam(required = false) String text,
@@ -39,11 +45,4 @@ public class PublicEventsController {
         return service.getEventsWithFilters(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from,
                 size, request);
     }
-
-    @GetMapping("{id}")
-    public EventFullDto getEventWithFullInfoById(@PathVariable Long id, HttpServletRequest request) {
-        log.info("Get Event by id {}", id);
-        return service.getEventWithFullInfoById(id, request);
-    }
-
 }

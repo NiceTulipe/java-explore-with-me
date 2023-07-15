@@ -30,25 +30,22 @@ public class RequestServiceImpl implements RequestService {
     private final EventsRepository eventRepository;
     private final UserRepository userRepository;
 
-    /**
-     * Добавление запроса от текущего пользователя на участие в событии
-     */
     @Transactional
     public ParticipationRequestDto createRequest(Long userId, Long eventId) {
         if (userId == null || eventId == null) {
-            throw new BadRequestException("Некорректный запрос");
+            throw new BadRequestException("Incorrect request");
         }
         User user = checkUser(userId);
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Событие с таким id не найдено."));
+                .orElseThrow(() -> new NotFoundException("Event with id not found"));
         if (event.getInitiator().getId().equals(userId)) {
-            throw new ConflictException("Инициатор события не может добавить запрос на участие в своём событии.");
+            throw new ConflictException("Event creator cannot be a participant");
         }
         if (event.getState().equals(State.PENDING) || event.getState().equals(State.CANCELED)) {
-            throw new ConflictException("Нельзя участвовать в неопубликованном событии.");
+            throw new ConflictException("You cannot participate in an unpublished event");
         }
         if (event.getParticipantLimit() != 0 && event.getParticipantLimit() <= event.getConfirmedRequests())
-            throw new ConflictException("У события достигнут лимит запросов на участие.");
+            throw new ConflictException("Event has reached the limit of participation requests");
         Request request;
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             request = Request.builder()
@@ -70,9 +67,6 @@ public class RequestServiceImpl implements RequestService {
         return toRequestDto(requestRepository.save(request));
     }
 
-    /**
-     * Получение информации о заявках текущего пользователя на участие в чужих событиях
-     */
     public List<ParticipationRequestDto> getRequestsForUser(Long userId) {
         User user = checkUser(userId);
         List<Request> requests = requestRepository.findByRequester(user);
@@ -81,20 +75,17 @@ public class RequestServiceImpl implements RequestService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Отмена своего запроса на участие в событии
-     */
     @Transactional
     public ParticipationRequestDto cancelRequest(Long userId, Long requestId) {
         checkUser(userId);
         Request request = requestRepository.findById(requestId)
-                .orElseThrow(() -> new NotFoundException("Запроса с текущим id не найдено."));
+                .orElseThrow(() -> new NotFoundException("Request with id not found"));
         request.setStatus(State.CANCELED);
         return toRequestDto(requestRepository.save(request));
     }
 
     private User checkUser(Long idUser) {
         return userRepository.findById(idUser)
-                .orElseThrow(() -> new NotFoundException("Пользователь с таким id  не найден"));
+                .orElseThrow(() -> new NotFoundException("User with id not found"));
     }
 }

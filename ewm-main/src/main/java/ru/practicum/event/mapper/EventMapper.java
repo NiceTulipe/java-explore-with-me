@@ -1,6 +1,5 @@
 package ru.practicum.event.mapper;
 
-import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.practicum.category.model.Category;
 import ru.practicum.event.dto.EventFullDto;
@@ -15,7 +14,7 @@ import java.time.LocalDateTime;
 import static ru.practicum.category.mapper.CategoryMapper.toCategoryDto;
 import static ru.practicum.user.mapper.UserMapper.toUserShortDto;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class EventMapper {
 
     public static EventFullDto toEventFullDto(Event event, Long views) {

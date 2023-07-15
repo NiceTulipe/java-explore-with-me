@@ -29,7 +29,7 @@ public class PrivateEventsController {
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto createEvent(@PathVariable Long userId,
                                     @RequestBody @Valid NewEventDto dto) {
-        log.info("Create Event from userId {}, dto {}", userId, dto);
+        log.info("Create Event from userId {}", userId);
         return service.createEvent(userId, dto);
     }
 
@@ -52,7 +52,7 @@ public class PrivateEventsController {
     public EventFullDto updateEvent(@PathVariable Long userId,
                                     @PathVariable Long eventId,
                                     @RequestBody @Valid UpdateEvent dto) {
-        log.info("Update Event with eventId {} from userId {}, dto {}", eventId, userId, dto);
+        log.info("Update Event with eventId {} from userId {}", eventId, userId);
         return service.updateEvent(userId, eventId, dto);
     }
 
@@ -67,8 +67,7 @@ public class PrivateEventsController {
     public EventRequestStatusUpdateResult changeRequestsStatus(@PathVariable Long userId,
                                                                @PathVariable Long eventId,
                                                                @RequestBody EventRequestStatusUpdateRequest dto) {
-        log.info("Change Requests status with userId {}, eventId {}, dto {} ", userId, eventId, dto);
+        log.info("Change Requests status with userId {}, eventId {}", userId, eventId);
         return service.changeRequestsStatus(userId, eventId, dto);
     }
-
 }

@@ -30,9 +30,6 @@ public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
     private final EventsRepository eventsRepository;
 
-    /**
-     * Добавление новой подборки(может не содержать событий)
-     */
     @Transactional
     public CompilationDto createCompilation(NewCompilationDto dto) {
         if (dto.getPinned() == null) {
@@ -51,17 +48,23 @@ public class CompilationServiceImpl implements CompilationService {
         return toCompilationDto(newCompilation, eventsShortDtos);
     }
 
-    /**
-     * Удаление подборки
-     */
-    @Transactional
-    public void deleteCompilation(Long compId) {
-        compilationRepository.deleteById(compId);
+    public CompilationDto getCompilation(Long compId) {
+        return toCompilationDto(findCompilationById(compId));
     }
 
-    /**
-     * Обновление информации о подборке
-     */
+    public List<CompilationDto> getCompilationsByFilters(Boolean pinned, Integer from, Integer size) {
+        PageRequest page = PageRequest.of(from, size);
+        List<Compilation> compilations = compilationRepository.findByPinned(pinned, page);
+        return compilations.stream()
+                .map(CompilationMapper::toCompilationDto)
+                .collect(Collectors.toList());
+    }
+
+    private Compilation findCompilationById(Long compId) {
+        return compilationRepository.findById(compId)
+                .orElseThrow(() -> new NotFoundException("Подборка с таким id  не найдена"));
+    }
+
     @Transactional
     public CompilationDto updateCompilations(Long compId, UpdateCompilationRequest dto) {
         Compilation compilation = findCompilationById(compId);
@@ -85,26 +88,8 @@ public class CompilationServiceImpl implements CompilationService {
         return toCompilationDto(newCompilation, eventsShortDtos);
     }
 
-    /**
-     * Получение подборки событий по её id
-     */
-    public CompilationDto getCompilation(Long compId) {
-        return toCompilationDto(findCompilationById(compId));
-    }
-
-    /**
-     * Получение подборок событий
-     */
-    public List<CompilationDto> getCompilationsByFilters(Boolean pinned, Integer from, Integer size) {
-        PageRequest page = PageRequest.of(from, size);
-        List<Compilation> compilations = compilationRepository.findByPinned(pinned, page);
-        return compilations.stream()
-                .map(CompilationMapper::toCompilationDto)
-                .collect(Collectors.toList());
-    }
-
-    private Compilation findCompilationById(Long compId) {
-        return compilationRepository.findById(compId)
-                .orElseThrow(() -> new NotFoundException("Подборка с таким id  не найдена"));
+    @Transactional
+    public void deleteCompilation(Long compId) {
+        compilationRepository.deleteById(compId);
     }
 }
