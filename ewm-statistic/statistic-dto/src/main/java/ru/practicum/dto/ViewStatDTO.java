@@ -1,7 +1,6 @@
 package ru.practicum.dto;
 
 import lombok.*;
-import lombok.extern.jackson.Jacksonized;
 
 @Getter
 @Setter
