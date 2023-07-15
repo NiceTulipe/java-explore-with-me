@@ -14,9 +14,15 @@ import java.util.Map;
 public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handlerValidationException(final ValidationException exception) {
-        log.warn("Error! Validation fault, server status: '{}' text message: '{}'",
-                HttpStatus.BAD_REQUEST, exception.getMessage());
-        return Map.of("Validation fault, check your actions", exception.getMessage());
+    public ErrorResponse handleMissingIdException(StartEndRangeException exception) {
+        log.debug("Status 404 Not found {}", exception.getMessage(), exception);
+        return new ErrorResponse(exception.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleMissingIdException(Throwable exception) {
+        log.debug("Error {}", exception.getMessage(), exception);
+        return new ErrorResponse(exception.getMessage());
     }
 }
