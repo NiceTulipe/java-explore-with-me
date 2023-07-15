@@ -2,7 +2,6 @@ package ru.practicum.stats.model;
 
 import lombok.*;
 
-import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Getter

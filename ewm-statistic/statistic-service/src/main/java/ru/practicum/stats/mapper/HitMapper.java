@@ -12,6 +12,7 @@ public class HitMapper {
 
     public static final String pattern = "yyyy-MM-dd HH:mm:ss";
     public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+
     public static EndpointHit toHit(HitDTO hitRequestDTO) {
         return EndpointHit.builder()
                 .app(hitRequestDTO.getApp())

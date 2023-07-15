@@ -31,7 +31,7 @@ public class ServiceController {
     }
 
     @GetMapping("/stats")
-    public List<ViewStatDTO> getStats (
+    public List<ViewStatDTO> getStats(
             @RequestParam(name = "start", required = false) @DateTimeFormat(pattern = HitMapper.pattern) LocalDateTime start,
             @RequestParam(name = "end", required = false) @DateTimeFormat(pattern = HitMapper.pattern) LocalDateTime end,
             @RequestParam(name = "uris", required = false) List<String> uris,
