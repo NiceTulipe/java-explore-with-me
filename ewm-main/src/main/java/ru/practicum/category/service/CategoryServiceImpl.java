@@ -45,6 +45,7 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Cant find category with id " + id));
     }
+
     public List<NewCategoryDto> getCategories(Integer from, Integer size) {
         PageRequest page = PageRequest.of(from, size);
         return categoryRepository.findAll(page).stream()
@@ -82,7 +83,6 @@ public class CategoryServiceImpl implements CategoryService {
         }
         categoryRepository.deleteById(id);
     }
-
 
     private NewCategoryDto saveCategory(Category category) {
         try {

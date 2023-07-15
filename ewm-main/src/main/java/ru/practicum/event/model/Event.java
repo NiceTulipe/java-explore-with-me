@@ -3,7 +3,7 @@ package ru.practicum.event.model;
 import lombok.*;
 import ru.practicum.category.model.Category;
 import ru.practicum.location.Location;
-import ru.practicum.modelstate.State;
+import ru.practicum.enumies.State;
 import ru.practicum.user.model.User;
 
 import javax.persistence.*;
