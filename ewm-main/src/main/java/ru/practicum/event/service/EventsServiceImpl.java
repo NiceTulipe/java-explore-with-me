@@ -5,35 +5,32 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.category.model.Category;
 import ru.practicum.category.dao.CategoryRepository;
+import ru.practicum.category.model.Category;
 import ru.practicum.client.StatClient;
 import ru.practicum.dto.HitDTO;
 import ru.practicum.dto.ViewStatDTO;
-import ru.practicum.event.dto.EventFullDto;
-import ru.practicum.event.dto.EventsShortDto;
-import ru.practicum.event.dto.NewEventDto;
-import ru.practicum.event.dto.UpdateEvent;
-import ru.practicum.event.model.Event;
+import ru.practicum.enumies.Sort;
+import ru.practicum.enumies.State;
+import ru.practicum.enumies.StateAction;
+import ru.practicum.event.dao.EventsRepository;
+import ru.practicum.event.dto.*;
 import ru.practicum.event.mapper.EventMapper;
-import ru.practicum.event.repository.EventsRepository;
+import ru.practicum.event.model.Event;
 import ru.practicum.exception.BadRequestException;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.IncorrectStateException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.location.Location;
 import ru.practicum.location.LocationRepository;
-import ru.practicum.enumies.Sort;
-import ru.practicum.enumies.State;
-import ru.practicum.enumies.StateAction;
+import ru.practicum.request.dao.RequestRepository;
 import ru.practicum.request.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.request.dto.EventRequestStatusUpdateResult;
 import ru.practicum.request.dto.ParticipationRequestDto;
-import ru.practicum.request.model.Request;
 import ru.practicum.request.mapper.RequestMapper;
-import ru.practicum.request.repository.RequestRepository;
-import ru.practicum.user.model.User;
+import ru.practicum.request.model.Request;
 import ru.practicum.user.dao.UserRepository;
+import ru.practicum.user.model.User;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -124,30 +121,24 @@ public class EventsServiceImpl implements EventsService {
         return getEventFullDto(dto, event);
     }
 
-    public List<EventFullDto> getEventsForAdmin(List<Long> users,
-                                                List<String> states,
-                                                List<Long> categories,
-                                                LocalDateTime rangeStart,
-                                                LocalDateTime rangeEnd,
-                                                Integer from,
-                                                Integer size) {
-        PageRequest page = PageRequest.of(from, size);
+    public List<EventFullDto> getEventsForAdmin(SearchEventParamsAdmin paramsAdmin) {
+        PageRequest page = PageRequest.of(paramsAdmin.getFrom(), paramsAdmin.getSize());
         List<State> stateList = null;
         LocalDateTime start = null;
         LocalDateTime end = null;
-        if (states != null) {
-            stateList = states.stream()
+        if (paramsAdmin.getStates() != null) {
+            stateList = paramsAdmin.getStates().stream()
                     .map(State::valueOf)
                     .collect(Collectors.toList());
         }
-        if (rangeStart != null) {
-            start = rangeStart;
+        if (paramsAdmin.getRangeStart() != null) {
+            start = paramsAdmin.getRangeStart();
         }
-        if (rangeEnd != null) {
-            end = rangeEnd;
+        if (paramsAdmin.getRangeEnd() != null) {
+            end = paramsAdmin.getRangeEnd();
         }
         List<Event> events = eventRepository.getEventsWithUsersStatesCategoriesDateTime(
-                users, stateList, categories, start, end, page);
+                paramsAdmin.getUsers(), stateList, paramsAdmin.getCategories(), start, end, page);
         Map<Long, Long> hits = getStatisticFromListEvents(events);
         return events.stream()
                 .map(e -> toEventFullDto(e, hits.getOrDefault(e.getId(), 0L)))
@@ -195,28 +186,24 @@ public class EventsServiceImpl implements EventsService {
         return getEventFullDto(dto, event);
     }
 
-    public List<EventsShortDto> getEventsWithFilters(String text,
-                                                     List<Long> categories,
-                                                     Boolean paid,
-                                                     LocalDateTime rangeStart,
-                                                     LocalDateTime rangeEnd,
-                                                     Boolean onlyAvailable,
-                                                     String sort,
-                                                     Integer from,
-                                                     Integer size,
+    public List<EventsShortDto> getEventsWithFilters(SearchEventParamsPublic paramsPublic,
                                                      HttpServletRequest request) {
-        PageRequest page = PageRequest.of(from, size);
+        PageRequest page = PageRequest.of(paramsPublic.getFrom(), paramsPublic.getSize());
         List<Event> events = new ArrayList<>();
-        checkDateTime(rangeStart, rangeEnd);
-        if (onlyAvailable) {
-            if (sort == null) {
+        checkDateTime(paramsPublic.getRangeStart(), paramsPublic.getRangeEnd());
+        if (paramsPublic.getOnlyAvailable()) {
+            if (paramsPublic.getSort() == null) {
                 events = eventRepository.getAvailableEventsWithFiltersDateSorted(
-                        text, State.PUBLISHED, categories, paid, rangeStart, rangeEnd, page);
+                        paramsPublic.getText(), State.PUBLISHED, paramsPublic.getCategories(),
+                        paramsPublic.getPaid(), paramsPublic.getRangeStart(),
+                        paramsPublic.getRangeEnd(), page);
             } else {
-                switch (Sort.valueOf(sort)) {
+                switch (Sort.valueOf(paramsPublic.getSort())) {
                     case EVENT_DATE:
                         events = eventRepository.getAvailableEventsWithFiltersDateSorted(
-                                text, State.PUBLISHED, categories, paid, rangeStart, rangeEnd, page);
+                                paramsPublic.getText(), State.PUBLISHED, paramsPublic.getCategories(),
+                                paramsPublic.getPaid(), paramsPublic.getRangeStart(),
+                                paramsPublic.getRangeEnd(), page);
                         addStatistic(request);
                         Map<Long, Long> hits = getStatisticFromListEvents(events);
                         return events.stream()
@@ -225,7 +212,9 @@ public class EventsServiceImpl implements EventsService {
                                 .collect(Collectors.toList());
                     case VIEWS:
                         events = eventRepository.getAvailableEventsWithFilters(
-                                text, State.PUBLISHED, categories, paid, rangeStart, rangeEnd, page);
+                                paramsPublic.getText(), State.PUBLISHED, paramsPublic.getCategories(),
+                                paramsPublic.getPaid(), paramsPublic.getRangeStart(),
+                                paramsPublic.getRangeEnd(), page);
                         addStatistic(request);
                         Map<Long, Long> hits3 = getStatisticFromListEvents(events);
                         return events.stream()
@@ -236,21 +225,27 @@ public class EventsServiceImpl implements EventsService {
                 }
             }
         } else {
-            if (sort == null) {
+            if (paramsPublic.getSort() == null) {
                 events = eventRepository.getAllEventsWithFiltersDateSorted(
-                        text, State.PUBLISHED, categories, paid, rangeStart, rangeEnd, page);
+                        paramsPublic.getText(), State.PUBLISHED, paramsPublic.getCategories(),
+                        paramsPublic.getPaid(), paramsPublic.getRangeStart(),
+                        paramsPublic.getRangeEnd(), page);
             } else {
-                switch (Sort.valueOf(sort)) {
+                switch (Sort.valueOf(paramsPublic.getSort())) {
                     case EVENT_DATE:
                         events = eventRepository.getAllEventsWithFiltersDateSorted(
-                                text, State.PUBLISHED, categories, paid, rangeStart, rangeEnd, page);
+                                paramsPublic.getText(), State.PUBLISHED, paramsPublic.getCategories(),
+                                paramsPublic.getPaid(), paramsPublic.getRangeStart(),
+                                paramsPublic.getRangeEnd(), page);
                         addStatistic(request);
                         return events.stream()
                                 .map(EventMapper::toEventShortDto)
                                 .collect(Collectors.toList());
                     case VIEWS:
                         events = eventRepository.getAllEventsWithFilters(
-                                text, State.PUBLISHED, categories, paid, rangeStart, rangeEnd, page);
+                                paramsPublic.getText(), State.PUBLISHED, paramsPublic.getCategories(),
+                                paramsPublic.getPaid(), paramsPublic.getRangeStart(),
+                                paramsPublic.getRangeEnd(), page);
                         addStatistic(request);
                         Map<Long, Long> hits = getStatisticFromListEvents(events);
                         return events.stream()

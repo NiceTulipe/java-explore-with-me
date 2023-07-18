@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.exception.BadRequestException;
 import ru.practicum.exception.ConflictException;
-import ru.practicum.user.dto.NewUserDto;
-import ru.practicum.user.model.User;
-import ru.practicum.user.mapper.UserMapper;
 import ru.practicum.user.dao.UserRepository;
+import ru.practicum.user.dto.NewUserDto;
+import ru.practicum.user.mapper.UserMapper;
+import ru.practicum.user.model.User;
 
 import java.util.List;
 import java.util.stream.Collectors;

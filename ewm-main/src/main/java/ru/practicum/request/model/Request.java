@@ -23,12 +23,10 @@ public class Request {
     private Long id;
     @Column(name = "events_id")
     private Long eventId;
-    @Column(name = "created")
     private LocalDateTime created;
     @ManyToOne
     @JoinColumn(name = "requester_id")
     private User requester;
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
     private State status;
 }

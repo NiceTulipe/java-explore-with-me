@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ru.practicum.location.Location;
 import ru.practicum.enumies.StateAction;
+import ru.practicum.location.Location;
 
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;

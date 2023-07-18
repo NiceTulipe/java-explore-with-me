@@ -2,11 +2,11 @@ package ru.practicum.event.mapper;
 
 import lombok.NoArgsConstructor;
 import ru.practicum.category.model.Category;
+import ru.practicum.enumies.State;
 import ru.practicum.event.dto.EventFullDto;
 import ru.practicum.event.dto.EventsShortDto;
 import ru.practicum.event.dto.NewEventDto;
 import ru.practicum.event.model.Event;
-import ru.practicum.enumies.State;
 import ru.practicum.user.model.User;
 
 import java.time.LocalDateTime;

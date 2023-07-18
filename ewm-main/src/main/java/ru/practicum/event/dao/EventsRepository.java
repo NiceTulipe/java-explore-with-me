@@ -1,12 +1,12 @@
-package ru.practicum.event.repository;
+package ru.practicum.event.dao;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.practicum.category.model.Category;
-import ru.practicum.event.model.Event;
 import ru.practicum.enumies.State;
+import ru.practicum.event.model.Event;
 import ru.practicum.user.model.User;
 
 import java.time.LocalDateTime;
