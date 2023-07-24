@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.comments.dto.CommentDto;
 import ru.practicum.comments.dto.SearchCommentParams;
 import ru.practicum.comments.service.CommentService;
-import ru.practicum.event.dto.SearchEventParamsAdmin;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -36,11 +35,6 @@ public class PublicCommentController {
 
     @GetMapping
     public List<CommentDto> getCommentsByFilters(@Valid SearchCommentParams commentParams) {
-//            @RequestParam(required = false, name = "text") String text,
-//                                                 @RequestParam(required = false, name = "idEvent") Long idEvent,
-//                                                 @RequestParam(required = false, name = "idUser") Long idUser,
-//                                                 @RequestParam(required = false, defaultValue = "0") Integer from,
-//                                                 @RequestParam(required = false, defaultValue = "10") Integer size) {
         log.info("Get comments by Filters text {}, idEvent {}, idUser {}, from {}, size {}",
                 commentParams.getText(), commentParams.getIdEvent(), commentParams.getIdUser(),
                 commentParams.getFrom(), commentParams.getSize());

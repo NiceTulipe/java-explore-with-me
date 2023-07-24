@@ -1,14 +1,9 @@
 package ru.practicum.comments.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static ru.practicum.utility.UtilityClass.pattern;
 
 @Getter
 @Setter
